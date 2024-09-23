@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  KASIR
+  MANAJER
+}
+
+enum jenis_menu {
+  MAKANAN
+  MINUMAN
+}
+
+enum status {
+  belum_bayar
+  lunas
+  batal
+}
+
+model User {
+  id_user   Int    @id @default(autoincrement())
+  nama_user String
+  role      Role   @default(ADMIN)
+  email     String
+  username  String
+  password  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Transaksi Transaksi[]
+  Keranjang Keranjang[]
+
+  @@map("User")
+}
+
+model Menu {
+  id_menu   Int        @id @default(autoincrement())
+  nama_menu String
+  jenis     jenis_menu
+  deskripsi String
+  gambar    String
+  harga     Int
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  KeranjangMenu KeranjangMenu[]
+
+  @@map("Menu")
+}
+
+model Meja {
+  id_meja    Int         @id @default(autoincrement())
+  nomor_meja String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  Transaksi  Transaksi[]
+  Keranjang  Keranjang[]
+
+  @@map("Meja")
+}
+
+model Transaksi {
+  id_transaksi     Int                @id @default(autoincrement())
+  tgl_transaksi    DateTime
+  id_user          Int
+  user             User               @relation(fields: [id_user], references: [id_user])
+  id_meja          Int
+  meja             Meja               @relation(fields: [id_meja], references: [id_meja])
+  nama_pelanggan   String
+  status           status             @default(belum_bayar)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Detail_transaksi Detail_transaksi[]
+
+  @@map("Transaksi")
+}
+
+model Detail_transaksi {
+  id_detail_transaksi Int       @id @default(autoincrement())
+  id_transaksi        Int
+  transaksi           Transaksi @relation(fields: [id_transaksi], references: [id_transaksi])
+  total_harga         Int
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@map("Detail_transaksi")
+}
+
+model Keranjang {
+  id_cart        Int             @id @default(autoincrement())
+  id_user        Int
+  user           User            @relation(fields: [id_user], references: [id_user])
+  id_meja        Int
+  meja           Meja            @relation(fields: [id_meja], references: [id_meja])
+  nama_pelanggan String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  KeranjangMenu  KeranjangMenu[]
+
+  @@map("Keranjang")
+}
+
+model KeranjangMenu {
+  id_cart   Int
+  keranjang Keranjang @relation(fields: [id_cart], references: [id_cart])
+
+  id_menu Int
+  menu    Menu @relation(fields: [id_menu], references: [id_menu])
+
+  quantity Int
+
+  @@id([id_cart, id_menu])
+  @@map("KeranjangMenu")
+}
