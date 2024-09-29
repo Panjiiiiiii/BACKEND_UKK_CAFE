@@ -41,7 +41,7 @@ exports.addMeja = async (req, res) => {
       data: {
         newMeja,
       },
-      message: "Register Success",
+      message: "Success add table",
     });
   } catch (error) {
     console.log(error);
