@@ -87,10 +87,13 @@ exports.addUser = async (req, res) => {
   }
 };
 //Edit role
-exports.updateRole = async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
-    const newRole = updateRoleSchema.parse(req.body)
+    const newRole = updateRoleSchema.parse(req.body);
     const id_user = +req.params.id;
+    const email = req.body.email;
+    const password = req.body.password;
+
     const existingUser = await prisma.user.findFirst({
       where: {
         id_user: id_user,
@@ -103,12 +106,26 @@ exports.updateRole = async (req, res) => {
         message: "User not found",
       });
     }
+    const existingEmail = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+    if (existingEmail) {
+      return res.json({
+        message: "Email is used",
+      });
+    }
     const updateRole = await prisma.user.update({
       where: {
         id_user: id_user,
       },
       data: {
-        role: newRole.role,
+        nama_user: req.body.nama_user || existingUser.nama_user,
+        username: req.body.username || existingUser.username,
+        email: email || existingUser.email,
+        password: hashSync(password, 10) || hashSync(existingUser.password, 10),
+        role: newRole.role || existingEmail.role,
       },
     });
     return res.json({
@@ -127,25 +144,25 @@ exports.updateRole = async (req, res) => {
 //Delete user
 exports.deleteUser = async (req, res) => {
   try {
-    const id_meja = +req.params.id;
-    const existingMeja = await prisma.meja.findFirst({
+    const id_user = +req.params.id;
+    const existingUser = await prisma.user.findFirst({
       where: {
-        id_meja: id_meja,
+        id_user: id_user,
       },
     });
-    if (!existingMeja) {
+    if (!existingUser) {
       return res.json({
         status: "Fail",
         code: 404,
         message: "Meja not found",
       });
     }
-    const deleteMeja = await prisma.meja.delete({
+    const deleteUser = await prisma.user.delete({
       where: {
-        id_meja: id_meja,
+        id_user: id_user,
       },
     });
-    if (deleteMeja) {
+    if (deleteUser) {
       return res.json({
         status: "Success",
         message: "Data has been deleted",
