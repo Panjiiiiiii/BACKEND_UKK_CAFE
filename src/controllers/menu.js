@@ -125,7 +125,7 @@ exports.deleteMenu = async (req, res) => {
       where: { id_menu: menuId },
     });
 
-    if (!menu) {
+    if (!menuToDelete) {
       return res.json({
         status: "Fail",
         code: 404,

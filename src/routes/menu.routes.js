@@ -13,6 +13,6 @@ app.get("/image/:filename", menu.getMenuImage);
 app.get("/:search", authorize.authorize, menu.findMenu);
 app.post("/", authorize.authorize, adminValidator.isAdmin, menu.addMenu);
 app.put("/:id", authorize.authorize, adminValidator.isAdmin, menu.updateMenu);
-app.delete("/:id", authorize.authorize, adminValidator.isAdmin, menu.deleteMenu);
+app.delete("/drop/:id", authorize.authorize, adminValidator.isAdmin, menu.deleteMenu);
 
 module.exports = app;
