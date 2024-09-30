@@ -9,6 +9,6 @@ app.use(bodyParser.json());
 
 app.get("/", authorize.authorize, meja.selectAllMeja);
 app.post("/", authorize.authorize, adminValidator.isAdmin, meja.addMeja);
-app.delete("/:id",authorize.authorize,adminValidator.isAdmin,meja.deleteMeja);
+app.delete("/drop/:id",authorize.authorize,adminValidator.isAdmin,meja.deleteMeja);
 
 module.exports = app;
