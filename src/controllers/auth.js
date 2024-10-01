@@ -103,10 +103,10 @@ exports.wrongPassword = async (req, res) => {
     }
     const newPassword = await prisma.user.update({
       where: {
-        email: existingUser.email,
+        id_user : existingUser.id_user
       },
       data: {
-        password: password(password, 10),
+        password: hashSync(password, 10),
       },
     });
     if (newPassword) {
@@ -115,7 +115,9 @@ exports.wrongPassword = async (req, res) => {
         message: "Password has been updated",
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 };
 
 exports.me = async (req, res) => {

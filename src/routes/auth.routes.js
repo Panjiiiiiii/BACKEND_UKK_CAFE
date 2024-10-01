@@ -8,6 +8,7 @@ app.use(bodyParser.json());
 
 app.post("/signup", auth.register);
 app.post("/login", auth.login);
+app.put("/wrongpass", auth.wrongPassword)
 app.post("/me", authorize.authorize, auth.me);
 
 module.exports = app;
