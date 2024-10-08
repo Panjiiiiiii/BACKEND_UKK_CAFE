@@ -8,7 +8,6 @@ const prisma = new PrismaClient({
 exports.getOrder = async (req, res) => {
   try {
     const order = await prisma.transaksi.findMany();
-    console.log(order);
     if (order) {
       return res.json({
         status: "Success",
@@ -27,10 +26,11 @@ exports.getOrder = async (req, res) => {
 exports.createOrder = async (req, res) => {
   try {
     return await prisma.$transaction(async (tx) => {
-      //check cartItem
+      // Check cart items
       const cart = await tx.keranjang.findMany({
         where: {
           id_user: req.user.id_user,
+          id_cart: +req.params.id,
         },
         include: {
           KeranjangMenu: {
@@ -46,6 +46,7 @@ exports.createOrder = async (req, res) => {
           message: "Cart is empty",
         });
       }
+
       const totalPrice = cart.reduce((prev, currentCart) => {
         const cartTotal = currentCart.KeranjangMenu.reduce(
           (subtotal, cartMenuItem) => {
@@ -55,8 +56,11 @@ exports.createOrder = async (req, res) => {
         );
         return prev + cartTotal;
       }, 0);
+
       console.log(totalPrice);
+
       for (const menuItem of cart) {
+        // Create new order
         const newOrder = await tx.transaksi.create({
           data: {
             tgl_transaksi: new Date(),
@@ -66,16 +70,33 @@ exports.createOrder = async (req, res) => {
             status: "belum_bayar",
           },
         });
+
+        // Create transaction details
         const newDetail = await tx.detail_transaksi.create({
           data: {
             id_transaksi: newOrder.id_transaksi,
             total_harga: totalPrice,
           },
         });
+
+        // Hapus item di keranjang
+        await tx.keranjangMenu.deleteMany({
+          where: {
+            id_cart: menuItem.id_cart, // Menggunakan menuItem.id_cart
+          },
+        });
+
+        // Hapus keranjang
+        await tx.keranjang.delete({
+          where: {
+            id_cart: menuItem.id_cart, // Menggunakan menuItem.id_cart
+          },
+        });
       }
+
       return res.json({
         status: "Success",
-        message: "Items have been added to the cart",
+        message: "Order has been created and cart has been cleared",
       });
     });
   } catch (error) {
@@ -86,6 +107,7 @@ exports.createOrder = async (req, res) => {
     });
   }
 };
+
 //Create struk
 exports.createStruk = async (req, res) => {
   try {
@@ -206,19 +228,6 @@ exports.changeStatus = async (req, res) => {
         message: "Cart not found",
       });
     }
-
-    await prisma.keranjangMenu.deleteMany({
-      where: {
-        id_cart: keranjang.id_cart,
-      },
-    });
-
-    await prisma.keranjang.delete({
-      where: {
-        id_cart: keranjang.id_cart,
-      },
-    });
-
     return res.json({
       status: "Success",
       data: updateData,

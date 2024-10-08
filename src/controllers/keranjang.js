@@ -127,7 +127,6 @@ exports.deleteItem = async (req, res) => {
         id_cart: +req.params.id,
       },
     });
-    console.log(existingcart);
     if (existingcart) {
       await prisma.keranjangMenu.deleteMany({
         where: {
@@ -223,8 +222,10 @@ exports.getCart = async (req, res) => {
       where: {
         id_user: req.user.id_user,
       },
+      include: {
+        meja: true,
+      },
     });
-    console.log(cart);
     return res.json({
       status: "Success",
       data: cart,
@@ -261,7 +262,6 @@ exports.findCart = async (req, res) => {
         message: "Cart not found",
       });
     }
-    console.log(cart);
     return res.json({
       status: "Success",
       data: cart,

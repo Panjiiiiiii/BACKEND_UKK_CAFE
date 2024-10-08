@@ -14,6 +14,6 @@ app.get("/date/", authorize.authorize, manajerValidator.isManajer, transaksi.get
 app.get("/user/:id", authorize.authorize, manajerValidator.isManajer,transaksi.getDatabyUser);
 app.get("/struk/:id", authorize.authorize, kasirValidator.isKasir,transaksi.createStruk);
 app.put("/:id", authorize.authorize, kasirValidator.isKasir,transaksi.changeStatus);
-app.post("/", authorize.authorize, kasirValidator.isKasir,transaksi.createOrder);
+app.post("/:id", authorize.authorize, kasirValidator.isKasir,transaksi.createOrder);
 
 module.exports = app;
