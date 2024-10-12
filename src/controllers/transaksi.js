@@ -7,7 +7,13 @@ const prisma = new PrismaClient({
 
 exports.getOrder = async (req, res) => {
   try {
-    const order = await prisma.transaksi.findMany();
+    const order = await prisma.transaksi.findMany({
+      include: {
+        meja: true,
+        user: true,
+        Detail_transaksi: true,
+      },
+    });
     if (order) {
       return res.json({
         status: "Success",

@@ -7,7 +7,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.get("/", authorize.authorize, adminValidator.isAdmin, user.getAllUsers);
+app.get("/", authorize.authorize, user.getAllUsers);
 app.get("/:id", authorize.authorize, adminValidator.isAdmin, user.selectUsers);
 app.post("/", authorize.authorize, adminValidator.isAdmin, user.addUser);
 app.put("/:id", authorize.authorize, adminValidator.isAdmin, user.updateUser);
