@@ -101,9 +101,17 @@ exports.wrongPassword = async (req, res) => {
         message: "Email not found",
       });
     }
+    if (!password) {
+      return res.json({
+        status: "Fail",
+        errorCode: 400,
+        message: "Password is required",
+      });
+    }
+
     const newPassword = await prisma.user.update({
       where: {
-        id_user : existingUser.id_user
+        id_user: existingUser.id_user,
       },
       data: {
         password: hashSync(password, 10),
