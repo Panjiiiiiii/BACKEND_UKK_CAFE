@@ -168,37 +168,6 @@ exports.changeStatus = async (req, res) => {
   }
 };
 
-//sorting order by date
-exports.getTransaksiByDate = async (req, res) => {
-  try {
-    const validatedData = dateSchema.safeParse(req.query);
-    const start = new Date(validatedData.data.startDate);
-    const end = new Date(validatedData.data.endDate);
-    const sortBy = validatedData.data.order === "asc" ? "asc" : "desc";
-    const transaksiList = await prisma.transaksi.findMany({
-      where: {
-        tgl_transaksi: {
-          gte: start,
-          lte: end,
-        },
-      },
-      orderBy: {
-        tgl_transaksi: sortBy,
-      },
-    });
-    console.log(transaksiList);
-    return res.json({
-      status: "Success",
-      data: transaksiList,
-      message: "Datas have been loaded",
-    });
-  } catch (error) {
-    return res.json({
-      status: "Fail",
-      error: error,
-    });
-  }
-};
 // get data order by user
 exports.getDatabyUser = async (req, res) => {
   try {
